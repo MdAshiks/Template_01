@@ -1,4 +1,48 @@
-RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}.html -f
-RewriteRule ^(.*)$ $1.html
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Redirect from HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Redirect to www
+RewriteCond %{HTTP_HOST} !^www\.
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+
+# Custom 404 Error Page
+ErrorDocument 404 /404.html
+
+# Deny Access to .htaccess File
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Block Specific IP Address
+<Limit GET POST>
+    Order Allow,Deny
+    Deny from 123.456.789.000
+    Allow from all
+</Limit>
+
+# Disable Directory Browsing
+Options -Indexes
+
+# Set Default Index File
+DirectoryIndex index.php index.html
+
+# Caching Settings
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 1 day"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+</IfModule>
+
+# Compression Settings
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
